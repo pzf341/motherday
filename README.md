@@ -1,2 +1,0 @@
-# motherday
-For my mom!
