@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="format-detection" content="telephone=no">
+<title>母亲节快乐 · Happy Mother's Day</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    margin: 0; padding: 0;
+    width: 100%; min-height: 100vh;
+    overflow-x: hidden;
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+    background-color: #fff5f8;
+    background-image:
+      linear-gradient(180deg, rgba(255,255,255,.7) 0%, rgba(255,245,248,.4) 35%, rgba(255,228,236,.6) 100%),
+      linear-gradient(rgba(255, 143, 171, .18) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 143, 171, .18) 1px, transparent 1px),
+      linear-gradient(rgba(255, 192, 213, .10) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 192, 213, .10) 1px, transparent 1px);
+    background-size:
+      100% 100%,
+      48px 48px,
+      48px 48px,
+      12px 12px,
+      12px 12px;
+    background-position:
+      0 0,
+      -1px -1px,
+      -1px -1px,
+      -1px -1px,
+      -1px -1px;
+    background-attachment: fixed, fixed, fixed, fixed, fixed;
+    color: #333;
+    user-select: none;
+    -webkit-user-select: none;
+    overscroll-behavior: none;
+  }
+  body {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 14px 14px 70px;
+  }
+
+  /* 背景飘字层 */
+  #bg-blessings {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+  }
+  .float-bless {
+    position: absolute;
+    bottom: -40px;
+    white-space: nowrap;
+    font-weight: 600;
+    opacity: 0;
+    animation: floatUp linear forwards;
+    text-shadow: 0 1px 2px rgba(255, 192, 213, .3);
+  }
+  @keyframes floatUp {
+    0%   { transform: translateY(0) translateX(0); opacity: 0; }
+    10%  { opacity: .85; }
+    50%  { transform: translateY(-50vh) translateX(12px); }
+    90%  { opacity: .85; }
+    100% { transform: translateY(-110vh) translateX(-10px); opacity: 0; }
+  }
+
+  /* 顶部状态条 */
+  .top-bar {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .stat-box {
+    flex: 1;
+    background: #ffffff;
+    border: 2px solid #ff8fab;
+    border-radius: 14px;
+    padding: 8px 12px;
+    box-shadow: 0 4px 12px rgba(255, 143, 171, .25);
+    text-align: center;
+    transition: transform .2s, box-shadow .2s, background .2s;
+  }
+  .stat-box .label {
+    display: block;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: #ff5c8a;
+    font-weight: 700;
+  }
+  .stat-box .value {
+    display: block;
+    font-size: 28px;
+    font-weight: 800;
+    color: #d6336c;
+    line-height: 1.1;
+    margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-box.combo-hot {
+    background: #fff0f5;
+    transform: scale(1.06);
+    box-shadow: 0 6px 18px rgba(255, 92, 138, .45);
+  }
+  .stat-box.combo-hot .value {
+    color: #ff2d6f;
+  }
+
+  /* 中央乐高 */
+  .stage {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  .lego-wrap {
+    position: relative;
+    width: 60vw;
+    max-width: 260px;
+    aspect-ratio: 1 / 1.2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+  .lego {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transform-origin: 50% 90%;
+    filter: drop-shadow(0 8px 18px rgba(214, 51, 108, .25));
+    transition: filter .2s;
+    /* 让图片白底与粉色背景"相乘"消失，等效透明效果 */
+    mix-blend-mode: multiply;
+  }
+  .lego.shake {
+    animation: shake .42s ease-in-out;
+  }
+  @keyframes shake {
+    0%   { transform: rotate(0deg); }
+    20%  { transform: rotate(-15deg); }
+    40%  { transform: rotate(14deg); }
+    60%  { transform: rotate(-12deg); }
+    80%  { transform: rotate(10deg); }
+    100% { transform: rotate(0deg); }
+  }
+  /* 占位：图片缺失时显示一个简易乐高 */
+  .lego-fallback {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    color: #ff5c8a; font-size: 14px; text-align: center;
+    border: 2px dashed #ffb6c8; border-radius: 16px;
+    background: #fff;
+    line-height: 1.6;
+    padding: 12px;
+  }
+
+  .tip {
+    margin-top: 18px;
+    color: #d6336c;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-shadow: 0 1px 0 #fff;
+  }
+
+  /* BUFF 浮字 */
+  .buff {
+    position: absolute;
+    pointer-events: none;
+    font-weight: 800;
+    font-size: 18px;
+    color: #ff2d6f;
+    text-shadow: 0 2px 4px rgba(255, 255, 255, .9), 0 0 6px rgba(255, 143, 171, .6);
+    animation: buffPop 1s ease-out forwards;
+    white-space: nowrap;
+  }
+  @keyframes buffPop {
+    0%   { transform: translate(-50%, -50%) scale(.4); opacity: 0; }
+    20%  { transform: translate(-50%, -70%) scale(1.25); opacity: 1; }
+    60%  { transform: translate(-50%, -110%) scale(1.1); opacity: 1; }
+    100% { transform: translate(-50%, -160%) scale(1.0); opacity: 0; }
+  }
+
+  /* 底部解锁提示 */
+  .unlock-bar {
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    z-index: 3;
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+    background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.85) 35%, #ffffff 100%);
+    text-align: center;
+    font-size: 12px;
+    color: #222;
+    line-height: 1.6;
+  }
+  .unlock-bar .head {
+    display: block;
+    font-size: 11px;
+    color: #555;
+    margin-bottom: 2px;
+  }
+  .unlock-bar .nums {
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px 8px;
+  }
+  .unlock-bar .num {
+    font-size: 13px;
+    color: #222;
+    font-weight: 600;
+  }
+  .unlock-bar .num.unlocked {
+    color: #ff2d6f;
+    font-weight: 800;
+    text-decoration: underline;
+    font-size: 15px;
+  }
+
+  /* 回忆卡片 */
+  .memory-mask {
+    position: fixed;
+    inset: 0;
+    z-index: 99;
+    background: rgba(255, 200, 220, .55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    animation: maskFade .3s ease;
+  }
+  .memory-mask.show { display: flex; }
+  @keyframes maskFade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  .memory-card {
+    position: relative;
+    width: 100%;
+    max-width: 360px;
+    background: #fff;
+    border: 2px solid #ff8fab;
+    border-radius: 18px;
+    padding: 28px 22px 24px;
+    box-shadow: 0 16px 40px rgba(214, 51, 108, .35);
+    text-align: center;
+    animation: cardPop .45s cubic-bezier(.2,1.3,.5,1);
+  }
+  @keyframes cardPop {
+    from { transform: scale(.6); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+  }
+  .memory-card .badge {
+    display: inline-block;
+    background: #ff5c8a;
+    color: #fff;
+    font-size: 12px;
+    padding: 3px 12px;
+    border-radius: 999px;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    font-weight: 700;
+  }
+  .memory-card .text {
+    font-size: 16px;
+    color: #333;
+    line-height: 1.8;
+    font-weight: 500;
+  }
+  .memory-card .close {
+    position: absolute;
+    top: 8px; right: 12px;
+    width: 28px; height: 28px;
+    line-height: 26px;
+    text-align: center;
+    color: #ff5c8a;
+    font-size: 22px;
+    cursor: pointer;
+    font-weight: 700;
+  }
+  .memory-card .hint {
+    margin-top: 14px;
+    font-size: 11px;
+    color: #999;
+  }
+</style>
+</head>
+<body>
+
+<div id="bg-blessings"></div>
+
+<div class="top-bar">
+  <div class="stat-box" id="blessings-box">
+    <span class="label">BLESSINGS</span>
+    <span class="value" id="blessings-val">0</span>
+  </div>
+  <div class="stat-box" id="combo-box">
+    <span class="label">COMBO</span>
+    <span class="value" id="combo-val">0</span>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="lego-wrap" id="lego-wrap">
+    <img class="lego" id="lego" src="images/lego.png" alt="lego"
+         onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+    <div class="lego-fallback" style="display:none;">
+      把乐高小人图片<br>放到 images/lego.png<br>即可显示
+    </div>
+  </div>
+  <div class="tip">点击振飞给妈妈发送祝福</div>
+</div>
+
+<div class="unlock-bar">
+  <span class="head">解 · 锁 · 回 · 忆</span>
+  <span class="nums" id="unlock-nums">
+    <span class="num" data-n="5">5次</span>
+    <span class="num" data-n="12">12次</span>
+    <span class="num" data-n="15">15次</span>
+    <span class="num" data-n="23">23次</span>
+    <span class="num" data-n="88">88次</span>
+    <span class="num" data-n="199">199次</span>
+    <span class="num" data-n="255">255次</span>
+  </span>
+</div>
+
+<div class="memory-mask" id="memory-mask">
+  <div class="memory-card" id="memory-card">
+    <div class="close" id="memory-close">×</div>
+    <div class="badge" id="memory-badge">回忆解锁</div>
+    <div class="text" id="memory-text"></div>
+    <div class="hint">点击空白处关闭</div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const buffWords = ["好运+1", "美丽+1", "快乐+1", "幸福+1", "开心+1"];
+  const blessWords = ["妈妈辛苦了", "平安顺遂", "喜乐无忧", "健康常伴", "万事顺心", "被岁月温柔相待", "最好的妈妈"];
+  const pinkPalette = ["#ff8fab", "#ffc1d9", "#ff5c8a", "#ff2d6f", "#ffa6c0", "#e91e63"];
+  const memories = {
+    5:   "1999.05.23  谢谢您把我带到这个世界，我很喜欢这里，尤其是有您和爸爸的陪伴。",
+    12:  "2005  您和同事们带我爬了井冈山，大瀑布前有我的照片，红米饭我能吃七碗！",
+    15:  "2013.07  北京！北京！您带我看了故宫和长城，我终于也是“好汉”了。",
+    23:  "2019.02  云南玩的超级开心，玉龙雪山，苍山洱海，我很庆幸和您一起观赏。",
+    88:  "2023.02  西安之行我们走了很多路，吵了许多架。烧香时衣服灼破了个洞，我们都释怀的笑了。",
+    199: "2025.08  青甘大环线，戈壁盐湖大漠很精彩，我也真正的第一次意识到您老了，该轮到我来保护您了。",
+    255: "2026.05.10  恭喜妈妈解锁了全部回忆，儿子期待与您继续创造更多的美好瞬间！"
+  };
+
+  const $ = id => document.getElementById(id);
+  const blessingsVal = $("blessings-val");
+  const comboVal = $("combo-val");
+  const comboBox = $("combo-box");
+  const blessingsBox = $("blessings-box");
+  const legoWrap = $("lego-wrap");
+  const lego = $("lego");
+  const unlockNums = $("unlock-nums");
+  const memoryMask = $("memory-mask");
+  const memoryText = $("memory-text");
+  const memoryBadge = $("memory-badge");
+  const memoryClose = $("memory-close");
+  const bg = $("bg-blessings");
+
+  let total = 0;
+  let combo = 0;
+  let comboTimer = null;
+  let unlocked = new Set();
+  let shakeLock = false;
+
+  function rand(min, max) { return Math.random() * (max - min) + min; }
+  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+  function bumpStat(box) {
+    box.style.transition = "none";
+    box.style.transform = "scale(1.12)";
+    requestAnimationFrame(() => {
+      box.style.transition = "transform .25s";
+      box.style.transform = "scale(1)";
+    });
+  }
+
+  function updateCombo(n) {
+    combo = n;
+    comboVal.textContent = combo;
+    if (combo >= 3) comboBox.classList.add("combo-hot");
+    else comboBox.classList.remove("combo-hot");
+  }
+
+  function resetComboLater() {
+    if (comboTimer) clearTimeout(comboTimer);
+    comboTimer = setTimeout(() => updateCombo(0), 1200);
+  }
+
+  function spawnBuff() {
+    const word = pick(buffWords);
+    const span = document.createElement("span");
+    span.className = "buff";
+    span.textContent = word;
+    const rect = legoWrap.getBoundingClientRect();
+    const left = rand(rect.width * 0.15, rect.width * 0.85);
+    const top  = rand(rect.height * 0.15, rect.height * 0.55);
+    span.style.left = left + "px";
+    span.style.top = top + "px";
+    span.style.fontSize = (16 + Math.random() * 8) + "px";
+    legoWrap.appendChild(span);
+    setTimeout(() => span.remove(), 1050);
+  }
+
+  function shakeLego() {
+    if (shakeLock) {
+      lego.classList.remove("shake");
+      void lego.offsetWidth;
+    }
+    lego.classList.add("shake");
+    shakeLock = true;
+    setTimeout(() => {
+      lego.classList.remove("shake");
+      shakeLock = false;
+    }, 430);
+  }
+
+  function refreshUnlockBar() {
+    unlockNums.querySelectorAll(".num").forEach(el => {
+      const n = parseInt(el.dataset.n, 10);
+      if (unlocked.has(n)) el.classList.add("unlocked");
+      else el.classList.remove("unlocked");
+    });
+  }
+
+  function showMemory(n) {
+    if (!memories[n]) return;
+    memoryBadge.textContent = "回忆 · 第 " + n + " 次解锁";
+    memoryText.textContent = memories[n];
+    memoryMask.classList.add("show");
+  }
+  function hideMemory() {
+    memoryMask.classList.remove("show");
+  }
+  memoryMask.addEventListener("click", e => {
+    if (e.target === memoryMask) hideMemory();
+  });
+  memoryClose.addEventListener("click", hideMemory);
+
+  function onLegoTap(e) {
+    if (e.cancelable) e.preventDefault();
+    if (memoryMask.classList.contains("show")) return;
+
+    total++;
+    blessingsVal.textContent = total;
+    bumpStat(blessingsBox);
+    updateCombo(combo + 1);
+    bumpStat(comboBox);
+    resetComboLater();
+
+    shakeLego();
+    spawnBuff();
+    if (Math.random() < 0.35) spawnBuff();
+
+    if (memories[total] && !unlocked.has(total)) {
+      const milestone = total;
+      unlocked.add(milestone);
+      refreshUnlockBar();
+      setTimeout(() => showMemory(milestone), 350);
+    }
+  }
+  legoWrap.addEventListener("click", onLegoTap);
+  legoWrap.addEventListener("touchstart", function (e) {
+    onLegoTap(e);
+  }, { passive: false });
+
+  // 背景飘字
+  function spawnBless() {
+    const span = document.createElement("span");
+    span.className = "float-bless";
+    span.textContent = pick(blessWords);
+    const size = 14 + Math.random() * 14;
+    span.style.fontSize = size.toFixed(0) + "px";
+    span.style.left = rand(2, 92) + "vw";
+    span.style.color = pick(pinkPalette);
+    const dur = 8 + Math.random() * 5;
+    span.style.animationDuration = dur.toFixed(2) + "s";
+    span.style.animationDelay = "0s";
+    bg.appendChild(span);
+    setTimeout(() => span.remove(), dur * 1000 + 200);
+  }
+  // 启动时先撒几条
+  for (let i = 0; i < 5; i++) {
+    setTimeout(spawnBless, i * 400);
+  }
+  setInterval(spawnBless, 850);
+
+  // 防双击缩放
+  document.addEventListener("dblclick", e => e.preventDefault(), { passive: false });
+  document.addEventListener("gesturestart", e => e.preventDefault());
+})();
+</script>
+
+</body>
+</html>
